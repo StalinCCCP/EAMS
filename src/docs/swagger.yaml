@@ -1,0 +1,77 @@
+info:
+  contact: {}
+paths:
+  /login:
+    post:
+      parameters:
+      - description: 用户名
+        in: query
+        name: Username
+        required: true
+        type: string
+      - description: 密码
+        in: query
+        name: Pwd
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""} data中包含了用户token'
+          schema:
+            type: string
+      summary: 根据用户名和密码登录，并返回token
+      tags:
+      - 公共方法
+  /register:
+    post:
+      parameters:
+      - description: 用户名
+        in: query
+        name: Username
+        required: true
+        type: string
+      - description: 密码
+        in: query
+        name: Pwd
+        required: true
+        type: string
+      - description: 全名
+        in: query
+        name: Full_name
+        required: true
+        type: string
+      - description: 电子邮箱
+        in: query
+        name: Email
+        required: true
+        type: string
+      - description: 手机号
+        in: query
+        name: Phone_number
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""} data中包含了用户token'
+          schema:
+            type: string
+      summary: 输入用户名、密码、电子邮箱、手机号来创建用户（默认创建普通用户，提权在其他地方实现），并返回用户token
+      tags:
+      - 公共方法
+  /user-detail:
+    get:
+      parameters:
+      - description: 用户ID
+        in: query
+        name: User_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""} data中包含了用户ID、用户名、用户密码、用户角色、全名、电子邮箱、电话号码和注册日期'
+          schema:
+            type: string
+      summary: 根据用户ID找到用户，显示用户详情
+      tags:
+      - 公共方法
+swagger: "2.0"
