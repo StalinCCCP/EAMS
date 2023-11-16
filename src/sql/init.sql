@@ -54,7 +54,7 @@ create table if not exists User(
     User_id int primary key auto_increment,
     Username varchar(255),
     Pwd varchar(255),
-    Userrole varchar(50),
+    Userrole enum('Normal','Admin','Supervisor'),
     Full_name varchar(255),
     Email varchar(255),
     Phone_number varchar(20),
