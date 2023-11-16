@@ -1,7 +1,6 @@
 package service
 
 import (
-	"EAMSbackend/dbc"
 	"EAMSbackend/models"
 	"encoding/json"
 	"fmt"
@@ -17,17 +16,14 @@ import (
 
 func Init(c *gin.Context) {
 	var DBconf models.DBConf
-	var Supervisor models.User
+
 	if err := c.ShouldBindJSON(&DBconf); err != nil {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
+		return
 	}
-	if err := c.ShouldBindJSON(&Supervisor); err != nil {
-		log.Println("Bad request")
-		c.Status(http.StatusBadRequest)
-	}
-	Supervisor.Userrole = "Supervisor"
-	Supervisor.Entry_date = time.Now()
+	DBconf.Userrole = "Supervisor"
+	DBconf.Entry_date = time.Now()
 	_, err := os.Open("DBinfo.json")
 	if err == nil {
 		log.Println("File created, not permitted to init")
@@ -57,22 +53,74 @@ func Init(c *gin.Context) {
 		os.Remove("DBinfo.json")
 		return
 	}
-	sqlfile, err := os.ReadFile("sql/init.sql")
+	// sqlfile, err := os.ReadFile("sql/init.sql")
+	// if err != nil {
+	// 	log.Println("Failed to open SQL file:", err)
+	// 	c.Status(http.StatusInternalServerError)
+	// 	os.Remove("DBinfo.json")
+	// 	return
+	// }
+	// sqlstmt := string(sqlfile)
+	// err = db.Exec(sqlstmt).Error
+	err = db.AutoMigrate(&models.User{})
 	if err != nil {
-		log.Println("Failed to open SQL file:", err)
+		log.Println("Failed to create tables:", err)
 		c.Status(http.StatusInternalServerError)
 		os.Remove("DBinfo.json")
 		return
 	}
-	sqlstmt := string(sqlfile)
-	err = db.Raw(sqlstmt).Error
+	err = db.AutoMigrate(&models.Hardware{})
 	if err != nil {
-		log.Println("Failed to execute sql script:", err)
+		log.Println("Failed to create tables:", err)
 		c.Status(http.StatusInternalServerError)
 		os.Remove("DBinfo.json")
 		return
 	}
-	err = dbc.DB.Create(Supervisor).Error
+	err = db.AutoMigrate(&models.HardwareMaintenance{})
+	if err != nil {
+		log.Println("Failed to create tables:", err)
+		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
+		return
+	}
+	err = db.AutoMigrate(&models.Lab{})
+	if err != nil {
+		log.Println("Failed to create tables:", err)
+		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
+		return
+	}
+	err = db.AutoMigrate(&models.LabMaintenance{})
+	if err != nil {
+		log.Println("Failed to create tables:", err)
+		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
+		return
+	}
+	err = db.AutoMigrate(&models.Software{})
+	if err != nil {
+		log.Println("Failed to create tables:", err)
+		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
+		return
+	}
+	err = db.AutoMigrate(&models.SoftwareMaintenance{})
+	if err != nil {
+		log.Println("Failed to create tables:", err)
+		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
+		return
+	}
+	supervisor := &models.User{
+		Username:     DBconf.Username,
+		Pwd:          DBconf.Pwd,
+		Userrole:     DBconf.Userrole,
+		Full_name:    DBconf.Full_name,
+		Email:        DBconf.Email,
+		Phone_number: DBconf.Phone_number,
+		Entry_date:   DBconf.Entry_date,
+	}
+	err = db.Create(supervisor).Error
 	if err != nil {
 		log.Println("Failed to create supervisor:", err)
 		c.Status(http.StatusInternalServerError)

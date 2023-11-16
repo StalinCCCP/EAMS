@@ -6,7 +6,7 @@ type User struct {
 	User_id      uint `gorm:"primaryKey;autoIncrement"`
 	Username     string
 	Pwd          string
-	Userrole     string `gorm:"type:enum(enum('Normal','Admin','Supervisor')"`
+	Userrole     string `gorm:"type:enum('Normal','Admin','Supervisor')"`
 	Full_name    string
 	Email        string
 	Phone_number string
