@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"EAMSbackend/util"
+	"time"
+)
 
 type DBConf struct {
 	Server       string `json:"Server"`
@@ -10,8 +13,8 @@ type DBConf struct {
 	Username     string
 	Pwd          string
 	Userrole     string `gorm:"type:enum(enum('Normal','Admin','Supervisor')"`
-	Full_name    string
-	Email        string
-	Phone_number string
+	Full_name    util.NullString
+	Email        util.NullString
+	Phone_number util.NullString
 	Entry_date   time.Time
 }

@@ -2,6 +2,7 @@ package router
 
 import (
 	_ "EAMSbackend/docs"
+	"EAMSbackend/middlewares"
 	"EAMSbackend/service"
 
 	"github.com/gin-gonic/gin"
@@ -17,5 +18,9 @@ func Router() *gin.Engine {
 	r.POST("/user-detail", service.GetUserDetail)
 	r.POST("/login", service.Login)
 	r.POST("/register", service.Register)
+	authUser := r.Group("/user", middlewares.AuthUserCheck())
+	authUser.POST("/hdq", service.HardwareQuery)
+	authUser.GET("/hdcq", service.HardwareCategoryQuery)
+
 	return r
 }

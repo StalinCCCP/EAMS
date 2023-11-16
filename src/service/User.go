@@ -2,8 +2,8 @@ package service
 
 import (
 	"EAMSbackend/dbc"
-	"EAMSbackend/helper"
 	"EAMSbackend/models"
+	"EAMSbackend/util"
 	"fmt"
 	"log"
 	"net/http"
@@ -58,7 +58,10 @@ func GetUserDetail(c *gin.Context) {
 func Login(c *gin.Context) {
 	// username := c.PostForm("Username")
 	// pwd := c.PostForm("Pwd")
-	var user models.User
+	user := struct {
+		Username string
+		Pwd      string
+	}{}
 	if err := c.ShouldBindJSON(&user); err != nil {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
@@ -68,7 +71,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Username or Password should not be null"})
 		return
 	}
-	user.Pwd = helper.GetMd5(user.Pwd)
+	user.Pwd = util.GetMd5(user.Pwd)
 	data := new(models.User)
 	err := dbc.DB().Where("Username = ? AND Pwd = ?", user.Username, user.Pwd).First(&data).Error
 	if err != nil {
@@ -79,7 +82,7 @@ func Login(c *gin.Context) {
 			return
 		}
 	}
-	token, err := helper.GenerateToken(data.User_id, data.Username, data.Userrole)
+	token, err := util.GenerateToken(data.User_id, data.Username, data.Userrole)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": "Failed to generate token",
@@ -150,7 +153,7 @@ func Register(c *gin.Context) {
 	}
 	var user_id uint
 	dbc.DB().Where("Username = ?", data.Username).First(&user_id)
-	token, err := helper.GenerateToken(user_id, data.Username, data.Userrole)
+	token, err := util.GenerateToken(user_id, data.Username, data.Userrole)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": "Failed to generate token",

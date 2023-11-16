@@ -1,14 +1,17 @@
 package models
 
-import "time"
+import (
+	"EAMSbackend/util"
+	"time"
+)
 
 type User struct {
 	User_id      uint `gorm:"primaryKey;autoIncrement"`
 	Username     string
 	Pwd          string
 	Userrole     string `gorm:"type:enum('Normal','Admin','Supervisor')"`
-	Full_name    string
-	Email        string
-	Phone_number string
+	Full_name    util.NullString
+	Email        util.NullString
+	Phone_number util.NullString
 	Entry_date   time.Time
 }

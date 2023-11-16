@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"EAMSbackend/helper"
+	"EAMSbackend/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +10,7 @@ import (
 func AuthAdminCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := c.GetHeader("Authorization")
-		userClaim, err := helper.AnalyseToken(auth)
+		userClaim, err := util.AnalyseToken(auth)
 		if err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
@@ -30,7 +30,7 @@ func AuthAdminCheck() gin.HandlerFunc {
 func AuthSupervisorCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := c.GetHeader("Authorization")
-		userClaim, err := helper.AnalyseToken(auth)
+		userClaim, err := util.AnalyseToken(auth)
 		if err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
@@ -50,7 +50,7 @@ func AuthSupervisorCheck() gin.HandlerFunc {
 func AuthUserCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := c.GetHeader("Authorization")
-		userClaim, err := helper.AnalyseToken(auth)
+		userClaim, err := util.AnalyseToken(auth)
 		if err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)

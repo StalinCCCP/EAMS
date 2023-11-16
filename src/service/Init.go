@@ -1,8 +1,8 @@
 package service
 
 import (
-	"EAMSbackend/helper"
 	"EAMSbackend/models"
+	"EAMSbackend/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -114,7 +114,7 @@ func Init(c *gin.Context) {
 	}
 	supervisor := &models.User{
 		Username:     DBconf.Username,
-		Pwd:          helper.GetMd5(DBconf.Pwd),
+		Pwd:          util.GetMd5(DBconf.Pwd),
 		Userrole:     DBconf.Userrole,
 		Full_name:    DBconf.Full_name,
 		Email:        DBconf.Email,
@@ -128,7 +128,7 @@ func Init(c *gin.Context) {
 		os.Remove("DBinfo.json")
 		return
 	}
-	token, err := helper.GenerateToken(supervisor.User_id, supervisor.Username, supervisor.Userrole)
+	token, err := util.GenerateToken(supervisor.User_id, supervisor.Username, supervisor.Userrole)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": "Failed to generate token",
