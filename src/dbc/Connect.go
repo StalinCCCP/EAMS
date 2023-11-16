@@ -1,7 +1,7 @@
 package dbc
 
 import (
-	"EAMSbackend/dbc/models"
+	"EAMSbackend/models"
 	"encoding/json"
 	"fmt"
 	"io"
