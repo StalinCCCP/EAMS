@@ -1,12 +1,14 @@
 package service
 
 import (
-	"EAMSbackend/dbc/models"
+	"EAMSbackend/dbc"
+	"EAMSbackend/models"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -15,10 +17,17 @@ import (
 
 func Init(c *gin.Context) {
 	var DBconf models.DBConf
+	var Supervisor models.User
 	if err := c.ShouldBindJSON(&DBconf); err != nil {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
 	}
+	if err := c.ShouldBindJSON(&Supervisor); err != nil {
+		log.Println("Bad request")
+		c.Status(http.StatusBadRequest)
+	}
+	Supervisor.Userrole = "Supervisor"
+	Supervisor.Entry_date = time.Now()
 	_, err := os.Open("DBinfo.json")
 	if err == nil {
 		log.Println("File created, not permitted to init")
@@ -53,6 +62,17 @@ func Init(c *gin.Context) {
 		return
 	}
 	sqlstmt := string(sqlfile)
-	db.Raw(sqlstmt)
+	err = db.Raw(sqlstmt).Error
+	if err != nil {
+		log.Println("Failed to execute sql script:", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	err = dbc.DB.Create(Supervisor).Error
+	if err != nil {
+		log.Println("Failed to create supervisor:", err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
 	c.Status(http.StatusOK)
 }
