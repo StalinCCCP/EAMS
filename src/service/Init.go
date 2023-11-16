@@ -128,5 +128,14 @@ func Init(c *gin.Context) {
 		os.Remove("DBinfo.json")
 		return
 	}
-	c.Status(http.StatusOK)
+	token, err := helper.GenerateToken(supervisor.User_id, supervisor.Username, supervisor.Userrole)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "Failed to generate token",
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": map[string]interface{}{
+			"token": token,
+		}})
 }
