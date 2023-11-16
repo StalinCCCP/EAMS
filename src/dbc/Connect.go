@@ -12,10 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB = Connect()
-
-func Connect() *gorm.DB {
-	file, err := os.Open("config/DBinfo.json")
+func DB() *gorm.DB {
+	file, err := os.Open("DBinfo.json")
 	if err != nil {
 		log.Println("Error opening file:", err)
 		return nil

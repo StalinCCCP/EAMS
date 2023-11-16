@@ -1,6 +1,7 @@
 package service
 
 import (
+	"EAMSbackend/helper"
 	"EAMSbackend/models"
 	"encoding/json"
 	"fmt"
@@ -113,7 +114,7 @@ func Init(c *gin.Context) {
 	}
 	supervisor := &models.User{
 		Username:     DBconf.Username,
-		Pwd:          DBconf.Pwd,
+		Pwd:          helper.GetMd5(DBconf.Pwd),
 		Userrole:     DBconf.Userrole,
 		Full_name:    DBconf.Full_name,
 		Email:        DBconf.Email,

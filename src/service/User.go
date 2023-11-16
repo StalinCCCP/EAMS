@@ -4,6 +4,8 @@ import (
 	"EAMSbackend/dbc"
 	"EAMSbackend/helper"
 	"EAMSbackend/models"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -18,18 +20,26 @@ import (
 // @Success 200 {string} json "{"code":"200","data":""} data中包含了用户ID、用户名、用户密码、用户角色、全名、电子邮箱、电话号码和注册日期"
 // @Router /user-detail [get]
 func GetUserDetail(c *gin.Context) {
-	user_id := c.Query("User_id")
-	if user_id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "UserID is not null!",
-		})
+	uid := struct {
+		User_id uint
+	}{}
+	if err := c.ShouldBindJSON(&uid); err != nil {
+		log.Println("Bad request")
+		c.Status(http.StatusBadRequest)
 		return
 	}
+	//user_id := c.Query("User_id")
+	// if user_id == "" {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"msg": "UserID is not null!",
+	// 	})
+	// 	return
+	// }
 	data := new(models.User)
-	err := dbc.DB.Omit("Pwd").Where("User_id = ?", user_id).Find(&data).Error
+	err := dbc.DB().Omit("pwd").Where("user_id = ?", uid.User_id).First(&data).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "User not found" + user_id,
+			"msg": "User not found " + fmt.Sprintf("%d", uid.User_id),
 		})
 		return
 	}
@@ -46,15 +56,21 @@ func GetUserDetail(c *gin.Context) {
 // @Success 200 {string} json "{"code":"200","data":""} data中包含了用户token"
 // @Router /login [post]
 func Login(c *gin.Context) {
-	username := c.PostForm("Username")
-	pwd := c.PostForm("Pwd")
-	if username == "" || pwd == "" {
+	// username := c.PostForm("Username")
+	// pwd := c.PostForm("Pwd")
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		log.Println("Bad request")
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	if user.Username == "" || user.Pwd == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Username or Password should not be null"})
 		return
 	}
-	pwd = helper.GetMd5(pwd)
+	user.Pwd = helper.GetMd5(user.Pwd)
 	data := new(models.User)
-	err := dbc.DB.Where("Username = ? AND Pwd = ?", username, pwd).First(&data).Error
+	err := dbc.DB().Where("Username = ? AND Pwd = ?", user.Username, user.Pwd).First(&data).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -89,20 +105,20 @@ func Login(c *gin.Context) {
 // @Success 200 {string} json "{"code":"200","data":""} data中包含了用户token"
 // @Router /register [post]
 func Register(c *gin.Context) {
-	username := c.PostForm("Username")
-	pwd := c.PostForm("Pwd")
-	full_name := c.PostForm("Full_name")
-	email := c.PostForm("Email")
-	phonenum := c.PostForm("Phone_number")
-	userrole := "Normal"
-	if username == "" || pwd == "" || full_name == "" || email == "" || phonenum == "" {
+	data := new(models.User)
+	if err := c.ShouldBindJSON(data); err != nil {
+		log.Println("Bad request")
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	if data.Username == "" || data.Pwd == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "Wrong parameters",
 		})
 		return
 	}
 	var cnt int64
-	err := dbc.DB.Where("Email=?", email).Model(new(models.User)).Count(&cnt).Error
+	err := dbc.DB().Where("Username=?", data.Username).Model(new(models.User)).Count(&cnt).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": "Error getting user",
@@ -111,18 +127,21 @@ func Register(c *gin.Context) {
 	}
 	if cnt > 0 {
 		c.JSON(http.StatusFailedDependency, gin.H{
-			"msg": "该邮箱已被注册",
+			"msg": "This username has been registered",
 		})
+		return
 	}
-	data := &models.User{
-		Username:     username,
-		Pwd:          pwd,
-		Userrole:     userrole,
-		Email:        email,
-		Phone_number: phonenum,
-		Entry_date:   time.Now(),
-	}
-	err = dbc.DB.Create(data).Error
+	// data := &models.User{
+	// 	Username:     username,
+	// 	Pwd:          pwd,
+	// 	Userrole:     userrole,
+	// 	Email:        email,
+	// 	Phone_number: phonenum,
+	// 	Entry_date:   time.Now(),
+	// }
+	data.Entry_date = time.Now()
+	data.Userrole = "Normal"
+	err = dbc.DB().Create(data).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": "Failed to create user",
@@ -130,8 +149,13 @@ func Register(c *gin.Context) {
 		return
 	}
 	var user_id uint
-	dbc.DB.Where("Email = ?", email).First(&user_id)
-	token, err := helper.GenerateToken(user_id, username, userrole)
+	dbc.DB().Where("Username = ?", data.Username).First(&user_id)
+	token, err := helper.GenerateToken(user_id, data.Username, data.Userrole)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "Failed to generate token",
+		})
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"data": map[string]interface{}{
 			"token": token,
