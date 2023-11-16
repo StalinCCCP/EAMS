@@ -45,6 +45,7 @@ func Init(c *gin.Context) {
 	if err != nil {
 		log.Println("Failed to write JSON config into the file")
 		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
 		return
 	}
 	file.Write(jsonData)
@@ -53,12 +54,14 @@ func Init(c *gin.Context) {
 	if err != nil {
 		log.Println("Failed to connect to the database:", err)
 		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
 		return
 	}
 	sqlfile, err := os.ReadFile("sql/init.sql")
 	if err != nil {
 		log.Println("Failed to open SQL file:", err)
 		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
 		return
 	}
 	sqlstmt := string(sqlfile)
@@ -66,12 +69,14 @@ func Init(c *gin.Context) {
 	if err != nil {
 		log.Println("Failed to execute sql script:", err)
 		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
 		return
 	}
 	err = dbc.DB.Create(Supervisor).Error
 	if err != nil {
 		log.Println("Failed to create supervisor:", err)
 		c.Status(http.StatusInternalServerError)
+		os.Remove("DBinfo.json")
 		return
 	}
 	c.Status(http.StatusOK)
