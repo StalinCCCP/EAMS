@@ -4,3 +4,4 @@ src/DBinfo.json
 **/.DS_Store
 .DS_Store?
 test/
+__debug*
