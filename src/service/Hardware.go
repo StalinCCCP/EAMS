@@ -87,13 +87,8 @@ func HardwareQuery(c *gin.Context) {
 	// 	return
 	// }
 	//fmt.Println(string(jsonData))
-	if data == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"data": "",
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"data": data,
-		})
-	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+
 }
