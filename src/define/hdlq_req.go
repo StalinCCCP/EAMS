@@ -1,4 +1,4 @@
-package models
+package define
 
 import "EAMSbackend/util"
 

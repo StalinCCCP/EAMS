@@ -21,9 +21,10 @@ func Router() *gin.Engine {
 	authUser.GET("/hdcq", service.HardwareCategoryQuery)
 	authUser.GET("/hddq", service.HardwareDetailQuery)
 	authUser.GET("/hdlocq", service.HardwareLocationQuery)
-	authUser.GET("/hdsq", service.HardwareStatusQuery)
-	authUser.POST("/hdupd", service.HardwareUpdate)
-	authUser.DELETE("/hddlt", service.HardwareDelete)
-	authUser.PUT("/hdc", service.HardwareCreate)
+	// authUser.GET("/hdsq", service.HardwareStatusQuery)
+	authAdmin := r.Group("/admin", middlewares.AuthAdminCheck())
+	authAdmin.POST("/hdupd", service.HardwareUpdate)
+	authAdmin.DELETE("/hddlt", service.HardwareDelete)
+	authAdmin.PUT("/hdc", service.HardwareCreate)
 	return R
 }

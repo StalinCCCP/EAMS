@@ -2,6 +2,7 @@ package service
 
 import (
 	"EAMSbackend/dbc"
+	"EAMSbackend/define"
 	"EAMSbackend/models"
 	"EAMSbackend/util"
 	"log"
@@ -24,19 +25,20 @@ func HardwareCategoryQuery(c *gin.Context) {
 		"data": data,
 	})
 }
-func HardwareStatusQuery(c *gin.Context) {
-	var data []util.NullString
-	err := dbc.DB().Model(&models.Hardware{}).Distinct("status").Pluck("status", &data).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err,
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"data": data,
-	})
-}
+
+//	func HardwareStatusQuery(c *gin.Context) {
+//		var data []util.NullString
+//		err := dbc.DB().Model(&models.Hardware{}).Distinct("status").Pluck("status", &data).Error
+//		if err != nil {
+//			c.JSON(http.StatusInternalServerError, gin.H{
+//				"msg": err,
+//			})
+//			return
+//		}
+//		c.JSON(http.StatusOK, gin.H{
+//			"data": data,
+//		})
+//	}
 func HardwareLocationQuery(c *gin.Context) {
 	var data []util.NullString
 	err := dbc.DB().Model(&models.Hardware{}).Distinct("location").Pluck("location", &data).Error
@@ -52,7 +54,7 @@ func HardwareLocationQuery(c *gin.Context) {
 }
 func HardwareListQuery(c *gin.Context) {
 
-	name := models.HDLQreq{}
+	name := define.HDLQreq{}
 	transfer, ok := c.Get("LocalCallData")
 	if !ok {
 		if err := c.ShouldBindJSON(&name); err != nil {
@@ -61,10 +63,13 @@ func HardwareListQuery(c *gin.Context) {
 			return
 		}
 	} else {
-		name = transfer.(models.HDLQreq)
+		name = transfer.(define.HDLQreq)
 		delete(c.Keys, "LocalCallData")
 	}
-	query := dbc.DB().Model(&models.Hardware{}).Where("hardware_name LIKE ?", "%"+name.HardwareName+"%")
+	query := dbc.DB().Model(&models.Hardware{})
+	if name.HardwareName != "" {
+		query = query.Where("hardware_name LIKE ?", "%"+name.HardwareName+"%")
+	}
 	if name.Category != "" {
 		query = query.Where("Category = ?", name.Category)
 	}
@@ -140,6 +145,17 @@ func HardwareUpdate(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
+	set := map[string]bool{
+		"占用":  true,
+		"保留":  true,
+		"正常":  true,
+		"非正常": true,
+	}
+	if !set[req.Status] {
+		log.Println("Bad request")
+		c.Status(http.StatusBadRequest)
+		return
+	}
 	query := dbc.DB().Model(&models.Hardware{}).Where("hardware_id = ?", req.HardwareID)
 	queryM := dbc.DB().Model(&models.HardwareMaintenance{}).Where("hardware_id = ? and status = '待处理'", req.HardwareID)
 	chk := new(models.HardwareMaintenance)
@@ -149,7 +165,7 @@ func HardwareUpdate(c *gin.Context) {
 			"msg": err,
 		})
 		return
-	} else if set := map[string]bool{"保留": true, "正常": true, "占用": true}; set[req.Status] && err == nil {
+	} else if req.Status != "非正常" && err == nil {
 		c.JSON(http.StatusFailedDependency, gin.H{
 			"msg": "Attempting to transform an abnormal hardware with maintenance processes unfinished to a normal one.",
 		})
@@ -207,6 +223,17 @@ func HardwareDelete(c *gin.Context) {
 func HardwareCreate(c *gin.Context) {
 	req := models.Hardware{}
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Bad request")
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	set := map[string]bool{
+		"占用":  true,
+		"保留":  true,
+		"正常":  true,
+		"非正常": true,
+	}
+	if !set[req.Status] {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
 		return

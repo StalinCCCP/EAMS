@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"EAMSbackend/dbc"
+	"EAMSbackend/models"
 	"EAMSbackend/util"
 	"net/http"
 
@@ -14,6 +16,33 @@ func AuthAdminCheck() gin.HandlerFunc {
 		if err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
+			return
+		}
+		query := dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+		var UserName []string
+		var UserRole []string
+		var User_id []int
+		if err = query.Pluck("user_id", &User_id).Error; err != nil {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
+		}
+		if err = query.Pluck("username", &UserName).Error; err != nil {
+			c.Abort()
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if err = query.Pluck("userrrole", &UserRole).Error; err != nil {
+			c.Abort()
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if UserName[0] != userClaim.Username || UserRole[0] != userClaim.Userrole {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
 			return
 		}
 		if userClaim == nil || userClaim.Userrole == "Normal" {
@@ -36,6 +65,33 @@ func AuthSupervisorCheck() gin.HandlerFunc {
 			c.Status(http.StatusInternalServerError)
 			return
 		}
+		query := dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+		var UserName []string
+		var UserRole []string
+		var User_id []int
+		if err = query.Pluck("user_id", &User_id).Error; err != nil {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
+		}
+		if err = query.Pluck("username", &UserName).Error; err != nil {
+			c.Abort()
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if err = query.Pluck("userrrole", &UserRole).Error; err != nil {
+			c.Abort()
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if UserName[0] != userClaim.Username || UserRole[0] != userClaim.Userrole {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
+			return
+		}
 		if userClaim == nil || userClaim.Userrole != "Supervisor" {
 			c.Abort()
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -54,6 +110,33 @@ func AuthUserCheck() gin.HandlerFunc {
 		if err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
+			return
+		}
+		query := dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+		var UserName []string
+		var UserRole []string
+		var User_id []int
+		if err = query.Pluck("user_id", &User_id).Error; err != nil {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
+		}
+		if err = query.Pluck("username", &UserName).Error; err != nil {
+			c.Abort()
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if err = query.Pluck("userrrole", &UserRole).Error; err != nil {
+			c.Abort()
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if UserName[0] != userClaim.Username || UserRole[0] != userClaim.Userrole {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
 			return
 		}
 		if userClaim == nil {
