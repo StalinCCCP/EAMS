@@ -1,7 +1,8 @@
-src/DBinfo.json
 .vscode/
 .DS_Store
 **/.DS_Store
 .DS_Store?
 test/
 __debug*
+
+DBinfo.json
