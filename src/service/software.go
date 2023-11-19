@@ -128,7 +128,7 @@ func SoftwareDetailQuery(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data": map[string]interface{}{
-			"HDinfo":    data1,
+			"Sinfo":     data1,
 			"Maintinfo": data2,
 		},
 	})
