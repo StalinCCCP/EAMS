@@ -73,7 +73,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	user.Pwd = util.GetMd5(user.Pwd)
-	data := new(models.User)
+	data := models.User{}
 	err := dbc.DB().Where("Username = ? AND Pwd = ?", user.Username, user.Pwd).First(&data).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

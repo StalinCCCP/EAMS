@@ -9,7 +9,7 @@ type NullString struct {
 	sql.NullString
 }
 
-func (v *NullString) MarshalJSON() ([]byte, error) {
+func (v NullString) MarshalJSON() ([]byte, error) {
 	if v.Valid {
 		return json.Marshal(v.String)
 	} else {
@@ -18,13 +18,13 @@ func (v *NullString) MarshalJSON() ([]byte, error) {
 }
 
 func (v NullString) UnmarshalJSON(data []byte) error {
-	var s *string
+	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	if s != nil {
+	if s != "" {
 		v.Valid = true
-		v.String = *s
+		v.String = s
 	} else {
 		v.Valid = false
 	}

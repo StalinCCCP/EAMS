@@ -1,7 +1,7 @@
 package define
 
 type LLQresp struct {
-	LabID    int
+	LabID    uint
 	LabName  string
 	Status   string
 	Location string

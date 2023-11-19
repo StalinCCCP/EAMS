@@ -47,7 +47,7 @@ func LabMaintenanceListQuery(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	buf := transfer.([]models.Lab)
+	buf := transfer.([]define.LLQresp)
 	var id []uint
 	for _, HD := range buf {
 		id = append(id, HD.LabID)

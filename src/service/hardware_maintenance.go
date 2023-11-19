@@ -47,7 +47,7 @@ func HardwareMaintenanceListQuery(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	buf := transfer.([]models.Hardware)
+	buf := transfer.([]define.HLQresp)
 	var id []uint
 	for _, HD := range buf {
 		id = append(id, HD.HardwareID)

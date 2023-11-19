@@ -28,12 +28,16 @@ func AuthAdminCheck() gin.HandlerFunc {
 				"msg": "Unauthorized",
 			})
 		}
+		query = dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+
 		if err = query.Pluck("username", &UserName).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
 			return
 		}
-		if err = query.Pluck("userrrole", &UserRole).Error; err != nil {
+		query = dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+
+		if err = query.Pluck("userrole", &UserRole).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
 			return
@@ -75,12 +79,16 @@ func AuthSupervisorCheck() gin.HandlerFunc {
 				"msg": "Unauthorized",
 			})
 		}
+		query = dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+
 		if err = query.Pluck("username", &UserName).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
 			return
 		}
-		if err = query.Pluck("userrrole", &UserRole).Error; err != nil {
+		query = dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+
+		if err = query.Pluck("userrole", &UserRole).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
 			return
@@ -109,7 +117,9 @@ func AuthUserCheck() gin.HandlerFunc {
 		userClaim, err := util.AnalyseToken(auth)
 		if err != nil {
 			c.Abort()
-			c.Status(http.StatusInternalServerError)
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
 			return
 		}
 		query := dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
@@ -121,13 +131,16 @@ func AuthUserCheck() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"msg": "Unauthorized",
 			})
+			return
 		}
+		query = dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
 		if err = query.Pluck("username", &UserName).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
 			return
 		}
-		if err = query.Pluck("userrrole", &UserRole).Error; err != nil {
+		query = dbc.DB().Model(&models.User{}).Where("user_id = ?", userClaim.User_id)
+		if err = query.Pluck("userrole", &UserRole).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
 			return

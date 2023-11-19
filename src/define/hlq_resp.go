@@ -1,7 +1,7 @@
 package define
 
 type HLQresp struct {
-	HardwareID   int
+	HardwareID   uint
 	HardwareName string
 	Category     string
 	Status       string

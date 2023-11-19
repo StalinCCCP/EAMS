@@ -1,7 +1,7 @@
 package define
 
 type SLQresp struct {
-	SoftwareID   int
+	SoftwareID   uint
 	SoftwareName string
 	Version      string
 	Status       string

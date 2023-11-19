@@ -47,7 +47,7 @@ func SoftwareMaintenanceListQuery(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	buf := transfer.([]models.Software)
+	buf := transfer.([]define.SLQresp)
 	var id []uint
 	for _, HD := range buf {
 		id = append(id, HD.SoftwareID)

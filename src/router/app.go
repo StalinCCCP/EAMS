@@ -10,6 +10,7 @@ import (
 
 func Router() *gin.Engine {
 	R := gin.Default()
+	R.Use(middlewares.Cors())
 	R.POST("/init", service.Init)
 	r := R.Group("/p", middlewares.Precheck())
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
