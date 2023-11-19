@@ -13,6 +13,23 @@ import (
 	"gorm.io/gorm"
 )
 
+func LabMaintenanceDetailQuery(c *gin.Context) {
+	req := struct {
+		MaintenanceProcessID uint
+	}{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	var data models.LabMaintenance
+	if err := dbc.DB().Model(&models.LabMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID).First(&data).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
 func LabMaintenanceListQuery(c *gin.Context) {
 	req := struct {
 		LabName             string

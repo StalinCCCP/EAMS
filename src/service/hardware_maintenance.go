@@ -132,7 +132,23 @@ func HardwareMaintenanceUpdate(c *gin.Context) { //TODO:对于没有填入的项
 	}
 	c.Status(http.StatusOK)
 }
-
+func HardwareMaintenanceDetailQuery(c *gin.Context) {
+	req := struct {
+		MaintenanceProcessID uint
+	}{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	var data models.HardwareMaintenance
+	if err := dbc.DB().Model(&models.HardwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID).First(&data).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
 func HardwareMaintenanceDelete(c *gin.Context) {
 	req := struct {
 		MaintenanceProcessID uint

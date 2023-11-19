@@ -13,6 +13,23 @@ import (
 	"gorm.io/gorm"
 )
 
+func SoftwareMaintenanceDetailQuery(c *gin.Context) {
+	req := struct {
+		MaintenanceProcessID uint
+	}{}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	var data models.SoftwareMaintenance
+	if err := dbc.DB().Model(&models.SoftwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID).First(&data).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
 func SoftwareMaintenanceListQuery(c *gin.Context) {
 	req := struct {
 		SoftwareName        string
