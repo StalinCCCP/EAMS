@@ -52,7 +52,7 @@ func Router() *gin.Engine {
 	authAdmin.DELETE("/ldlt", service.LabDelete)
 	authAdmin.PUT("/lc", service.LabCreate)
 	authAdmin.POST("/lmupd", service.LabMaintenanceUpdate)
-	authAdmin.PUT("/mc", service.LabMaintenanceCreate)
+	authAdmin.PUT("/lmc", service.LabMaintenanceCreate)
 	authAdmin.DELETE("/lmdlt", service.LabMaintenanceDelete)
 	authSupervisor := r.Group("/supervisor", middlewares.AuthSupervisorCheck())
 	authSupervisor.POST("/chmod", service.ChangeUserRole)
