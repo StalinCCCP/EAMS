@@ -12,21 +12,21 @@ import (
 	"gorm.io/gorm"
 )
 
-func HardwareCategoryQuery(c *gin.Context) {
-	var data []util.NullString
-	err := dbc.DB().Model(&models.Hardware{}).Distinct("Category").Pluck("Category", &data).Error
-	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"data": data,
-	})
-}
+// func SoftwareVersionQuery(c *gin.Context) {
+// 	var data []util.NullString
+// 	err := dbc.DB().Model(&models.Software{}).Distinct("Version").Pluck("Version", &data).Error
+// 	if err != nil {
+// 		c.Status(http.StatusInternalServerError)
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"data": data,
+// 	})
+// }
 
-//	func HardwareStatusQuery(c *gin.Context) {
+//	func SoftwareStatusQuery(c *gin.Context) {
 //		var data []util.NullString
-//		err := dbc.DB().Model(&models.Hardware{}).Distinct("status").Pluck("status", &data).Error
+//		err := dbc.DB().Model(&models.Software{}).Distinct("status").Pluck("status", &data).Error
 //		if err != nil {
 //			c.JSON(http.StatusInternalServerError, gin.H{
 //				"msg": err,
@@ -37,9 +37,9 @@ func HardwareCategoryQuery(c *gin.Context) {
 //			"data": data,
 //		})
 //	}
-func HardwareLocationQuery(c *gin.Context) {
+func SoftwareLocationQuery(c *gin.Context) {
 	var data []util.NullString
-	err := dbc.DB().Model(&models.Hardware{}).Distinct("location").Pluck("location", &data).Error
+	err := dbc.DB().Model(&models.Software{}).Distinct("location").Pluck("location", &data).Error
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
@@ -48,8 +48,8 @@ func HardwareLocationQuery(c *gin.Context) {
 		"data": data,
 	})
 }
-func HardwareListQuery(c *gin.Context) {
-	name := define.HLQreq{}
+func SoftwareListQuery(c *gin.Context) {
+	name := define.SLQreq{}
 	transfer, ok := c.Get("LocalCallData")
 	if !ok {
 		if err := c.ShouldBindJSON(&name); err != nil {
@@ -58,15 +58,15 @@ func HardwareListQuery(c *gin.Context) {
 			return
 		}
 	} else {
-		name = transfer.(define.HLQreq)
+		name = transfer.(define.SLQreq)
 		delete(c.Keys, "LocalCallData")
 	}
-	query := dbc.DB().Model(&models.Hardware{})
-	if name.HardwareName != "" {
-		query = query.Where("hardware_name LIKE ?", "%"+name.HardwareName+"%")
+	query := dbc.DB().Model(&models.Software{})
+	if name.SoftwareName != "" {
+		query = query.Where("Software_name LIKE ?", "%"+name.SoftwareName+"%")
 	}
-	if name.Category != "" {
-		query = query.Where("Category = ?", name.Category)
+	if name.Version != "" {
+		query = query.Where("Version = ?", name.Version)
 	}
 	if name.Status != "" {
 		query = query.Where("Status = ?", name.Status)
@@ -74,8 +74,8 @@ func HardwareListQuery(c *gin.Context) {
 	if name.Location.String != "" {
 		query = query.Where("Location = ?", name.Location)
 	}
-	var data []define.HLQresp
-	err := query.Select("hardware_id, hardware_name,category,status,location").Scan(&data).Error
+	var data []define.SLQresp
+	err := query.Select("Software_id, Software_name,Version,status,location").Scan(&data).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": err,
@@ -99,17 +99,17 @@ func HardwareListQuery(c *gin.Context) {
 	}
 }
 
-func HardwareDetailQuery(c *gin.Context) {
+func SoftwareDetailQuery(c *gin.Context) {
 	req := struct {
-		HardwareID uint
+		SoftwareID uint
 	}{}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	var data1 []models.Hardware
-	query := dbc.DB().Model(&models.Hardware{}).Where("hardware_id = ?", req.HardwareID)
+	var data1 []models.Software
+	query := dbc.DB().Model(&models.Software{}).Where("Software_id = ?", req.SoftwareID)
 	err := query.Find(&data1).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -117,8 +117,8 @@ func HardwareDetailQuery(c *gin.Context) {
 		})
 		return
 	}
-	var data2 []models.HardwareMaintenance
-	query = dbc.DB().Model(&models.HardwareMaintenance{}).Where("hardware_id = ?", req.HardwareID)
+	var data2 []models.SoftwareMaintenance
+	query = dbc.DB().Model(&models.SoftwareMaintenance{}).Where("Software_id = ?", req.SoftwareID)
 	err = query.Find(&data2).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -133,16 +133,14 @@ func HardwareDetailQuery(c *gin.Context) {
 		},
 	})
 }
-func HardwareUpdate(c *gin.Context) { //TODO:对于没有填入的项目 如何区分呢
-	req := models.Hardware{}
+func SoftwareUpdate(c *gin.Context) { //TODO:对于没有填入的项目 如何区分呢
+	req := models.Software{}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
 		return
 	}
 	set := map[string]bool{
-		"占用":  true,
-		"保留":  true,
 		"正常":  true,
 		"非正常": true,
 	}
@@ -153,9 +151,9 @@ func HardwareUpdate(c *gin.Context) { //TODO:对于没有填入的项目 如何�
 		})
 		return
 	}
-	query := dbc.DB().Model(&models.Hardware{}).Where("hardware_id = ?", req.HardwareID)
-	queryM := dbc.DB().Model(&models.HardwareMaintenance{}).Where("hardware_id = ? and status = '待处理'", req.HardwareID)
-	chk := new(models.HardwareMaintenance)
+	query := dbc.DB().Model(&models.Software{}).Where("Software_id = ?", req.SoftwareID)
+	queryM := dbc.DB().Model(&models.SoftwareMaintenance{}).Where("Software_id = ? and status = '待处理'", req.SoftwareID)
+	chk := new(models.SoftwareMaintenance)
 	err := queryM.First(chk).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -164,7 +162,7 @@ func HardwareUpdate(c *gin.Context) { //TODO:对于没有填入的项目 如何�
 		return
 	} else if req.Status != "非正常" && err == nil {
 		c.JSON(http.StatusFailedDependency, gin.H{
-			"msg": "Attempting to transform an abnormal hardware with maintenance processes unfinished to a normal one.",
+			"msg": "Attempting to transform an abnormal Software with maintenance processes unfinished to a normal one.",
 		})
 		return
 	}
@@ -177,25 +175,25 @@ func HardwareUpdate(c *gin.Context) { //TODO:对于没有填入的项目 如何�
 	c.Status(http.StatusOK)
 }
 
-func HardwareDelete(c *gin.Context) {
+func SoftwareDelete(c *gin.Context) {
 	req := struct {
-		HardwareID uint
+		SoftwareID uint
 	}{}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	query := dbc.DB().Model(&models.Hardware{}).Where("hardware_id = ?", req.HardwareID)
-	queryM := dbc.DB().Model(&models.HardwareMaintenance{}).Where("hardware_id = ?", req.HardwareID)
-	var tgt models.Hardware
+	query := dbc.DB().Model(&models.Software{}).Where("Software_id = ?", req.SoftwareID)
+	queryM := dbc.DB().Model(&models.SoftwareMaintenance{}).Where("Software_id = ?", req.SoftwareID)
+	var tgt models.Software
 	if err := query.Find(&tgt).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": err,
 		})
 		return
 	}
-	chk := new(models.HardwareMaintenance)
+	chk := new(models.SoftwareMaintenance)
 	err := queryM.First(chk).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -204,7 +202,7 @@ func HardwareDelete(c *gin.Context) {
 		return
 	} else if err == nil {
 		c.JSON(http.StatusFailedDependency, gin.H{
-			"msg": "Attempting to remove a hardware with maintenance.",
+			"msg": "Attempting to remove a Software with maintenance.",
 		})
 		return
 	}
@@ -217,16 +215,14 @@ func HardwareDelete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func HardwareCreate(c *gin.Context) {
-	req := models.Hardware{}
+func SoftwareCreate(c *gin.Context) {
+	req := models.Software{}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Bad request")
 		c.Status(http.StatusBadRequest)
 		return
 	}
 	set := map[string]bool{
-		"占用":  true,
-		"保留":  true,
 		"正常":  true,
 		"非正常": true,
 	}

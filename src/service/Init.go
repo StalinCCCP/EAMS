@@ -27,8 +27,10 @@ func Init(c *gin.Context) {
 	DBconf.Entry_date = time.Now()
 	_, err := os.Open("DBinfo.json")
 	if err == nil {
-		log.Println("File created, not permitted to init")
-		c.Status(http.StatusInternalServerError)
+		//log.Println("File created, not permitted to init")
+		c.JSON(http.StatusFailedDependency, gin.H{
+			"msg": "File created, not permitted to init",
+		})
 		return
 	}
 	file, err := os.Create("DBinfo.json")

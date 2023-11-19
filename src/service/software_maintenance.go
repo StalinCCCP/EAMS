@@ -13,12 +13,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func HardwareMaintenanceListQuery(c *gin.Context) {
+func SoftwareMaintenanceListQuery(c *gin.Context) {
 	req := struct {
-		HardwareName        string
-		HardwareCategory    string
-		HardwareStatus      string
-		HardwareLocation    util.NullString
+		SoftwareName        string
+		SoftwareVersion     string
+		SoftwareStatus      string
+		SoftwareLocation    util.NullString
 		MaintenanceDateFrom time.Time
 		MaintenanceDateTo   time.Time
 		CostFrom            float64
@@ -33,28 +33,28 @@ func HardwareMaintenanceListQuery(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	post := define.HLQreq{
-		HardwareName: req.HardwareName,
-		Category:     req.HardwareCategory,
-		Status:       req.HardwareStatus,
-		Location:     req.HardwareLocation,
+	post := define.SLQreq{
+		SoftwareName: req.SoftwareName,
+		Version:      req.SoftwareVersion,
+		Status:       req.SoftwareStatus,
+		Location:     req.SoftwareLocation,
 	}
 	c.Set("LocalCallData", post)
-	HardwareListQuery(c)
+	SoftwareListQuery(c)
 	transfer, ok := c.Get("LocalCallResult")
 	delete(c.Keys, "LocalCallResult")
 	if !ok {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	buf := transfer.([]models.Hardware)
+	buf := transfer.([]models.Software)
 	var id []uint
 	for _, HD := range buf {
-		id = append(id, HD.HardwareID)
+		id = append(id, HD.SoftwareID)
 	}
-	query := dbc.DB().Model(&models.HardwareMaintenance{})
+	query := dbc.DB().Model(&models.SoftwareMaintenance{})
 	if id != nil {
-		query = query.Where("hardware_id in (?)", id)
+		query = query.Where("Software_id in (?)", id)
 	}
 	if req.MaintenanceDateFrom != define.TimeNull {
 		query.Where("maintenance_date >= ?", req.MaintenanceDateFrom)
@@ -71,8 +71,8 @@ func HardwareMaintenanceListQuery(c *gin.Context) {
 	if req.MaintenanceStatus != "" {
 		query.Where("status = ?", req.MaintenanceStatus)
 	}
-	var data []define.HMLQresp
-	err := query.Select("maintenance_process_id,hardware_id,maintenance_date,cost,status").Scan(&data).Error
+	var data []define.SMLQresp
+	err := query.Select("maintenance_process_id,Software_id,maintenance_date,cost,status").Scan(&data).Error
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
@@ -82,8 +82,8 @@ func HardwareMaintenanceListQuery(c *gin.Context) {
 	})
 }
 
-func HardwareMaintenanceUpdate(c *gin.Context) { //TODO:对于没有填入的项目 如何区分呢 另外 需要用反射实现只提交提交过来的项
-	req := models.HardwareMaintenance{}
+func SoftwareMaintenanceUpdate(c *gin.Context) { //TODO:对于没有填入的项目 如何区分呢 另外 需要用反射实现只提交提交过来的项
+	req := models.SoftwareMaintenance{}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
@@ -97,35 +97,35 @@ func HardwareMaintenanceUpdate(c *gin.Context) { //TODO:对于没有填入的项
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	query := dbc.DB().Model(&models.HardwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
-	var HardwareID []uint
-	err := query.Pluck("hardware_id", &HardwareID).Error
+	query := dbc.DB().Model(&models.SoftwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
+	var SoftwareID []uint
+	err := query.Pluck("Software_id", &SoftwareID).Error
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	// 完成的变成未完成则要求对应的Hardware必须非正常
-	query = dbc.DB().Model(&models.HardwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
+	// 完成的变成未完成则要求对应的Software必须非正常
+	query = dbc.DB().Model(&models.SoftwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
 	var OriginalMaintenanceState []string
 	err = query.Pluck("status", &OriginalMaintenanceState).Error
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	var HardwareState []string
-	query = dbc.DB().Model(&models.Hardware{}).Where("hardware_id = ?", HardwareID[0])
-	err = query.Pluck("status", &HardwareState).Error
+	var SoftwareState []string
+	query = dbc.DB().Model(&models.Software{}).Where("Software_id = ?", SoftwareID[0])
+	err = query.Pluck("status", &SoftwareState).Error
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	if OriginalMaintenanceState[0] == "已完成" && req.Status == "待处理" && HardwareState[0] != "非正常" {
+	if OriginalMaintenanceState[0] == "已完成" && req.Status == "待处理" && SoftwareState[0] != "非正常" {
 		c.JSON(http.StatusFailedDependency, gin.H{
-			"msg": "Attempting to transform a finished maintenance process to an unfinished one when corresponding hardware has been in normal state.",
+			"msg": "Attempting to transform a finished maintenance process to an unfinished one when corresponding Software has been in normal state.",
 		})
 		return
 	}
-	query = dbc.DB().Model(&models.HardwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
+	query = dbc.DB().Model(&models.SoftwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
 	if err = query.Updates(&req).Error; err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
@@ -133,7 +133,7 @@ func HardwareMaintenanceUpdate(c *gin.Context) { //TODO:对于没有填入的项
 	c.Status(http.StatusOK)
 }
 
-func HardwareMaintenanceDelete(c *gin.Context) {
+func SoftwareMaintenanceDelete(c *gin.Context) {
 	req := struct {
 		MaintenanceProcessID uint
 	}{}
@@ -141,8 +141,8 @@ func HardwareMaintenanceDelete(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	query := dbc.DB().Model(&models.HardwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
-	var tgt models.HardwareMaintenance
+	query := dbc.DB().Model(&models.SoftwareMaintenance{}).Where("maintenance_process_id = ?", req.MaintenanceProcessID)
+	var tgt models.SoftwareMaintenance
 	if err := query.Find(&tgt).Error; err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
@@ -154,8 +154,8 @@ func HardwareMaintenanceDelete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func HardwareMaintenanceCreate(c *gin.Context) {
-	req := models.HardwareMaintenance{}
+func SoftwareMaintenanceCreate(c *gin.Context) {
+	req := models.SoftwareMaintenance{}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.Status(http.StatusBadRequest)
 		return
@@ -169,12 +169,12 @@ func HardwareMaintenanceCreate(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	query := dbc.DB().Model(&models.HardwareMaintenance{}).Where("hardware_id = ?", req.HardwareID)
-	//不存在的hardware不能存在维修过程 正常的hardware不能存在未完成的维修过程
-	chk := new(models.Hardware)
+	query := dbc.DB().Model(&models.SoftwareMaintenance{}).Where("Software_id = ?", req.SoftwareID)
+	//不存在的Software不能存在维修过程 正常的Software不能存在未完成的维修过程
+	chk := new(models.Software)
 	if err := query.First(chk).Error; err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusFailedDependency, gin.H{
-			"msg": "This HardwareID does not exist.",
+			"msg": "This SoftwareID does not exist.",
 		})
 		return
 	} else if err != nil {
@@ -183,7 +183,7 @@ func HardwareMaintenanceCreate(c *gin.Context) {
 	}
 	if chk.Status != "非正常" && req.Status == "待处理" {
 		c.JSON(http.StatusFailedDependency, gin.H{
-			"msg": "Attempting to add an undone maintenance process to a normal hardware.",
+			"msg": "Attempting to add an undone maintenance process to a normal Software.",
 		})
 		return
 	}

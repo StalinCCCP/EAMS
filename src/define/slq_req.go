@@ -2,9 +2,9 @@ package define
 
 import "EAMSbackend/util"
 
-type HDLQreq struct {
-	HardwareName string
-	Category     string
+type SLQreq struct {
+	SoftwareName string
+	Version      string
 	Status       string
 	Location     util.NullString
 }

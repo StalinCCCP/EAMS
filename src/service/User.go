@@ -2,6 +2,7 @@ package service
 
 import (
 	"EAMSbackend/dbc"
+	"EAMSbackend/define"
 	"EAMSbackend/models"
 	"EAMSbackend/util"
 	"fmt"
@@ -163,4 +164,62 @@ func Register(c *gin.Context) {
 		"data": map[string]interface{}{
 			"token": token,
 		}})
+}
+
+func GetUserList(c *gin.Context) {
+	name := struct {
+		Username string
+	}{}
+
+	if err := c.ShouldBindJSON(&name); err != nil {
+		log.Println("Bad request")
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	query := dbc.DB().Model(&models.User{})
+	if name.Username != "" {
+		query = query.Where("username like ?", "%"+name.Username+"%")
+	}
+	var data []define.Userresp
+	err := query.Select("user_id, username, userrole").Scan(&data).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": err,
+		})
+		return
+	}
+	// jsonData, err := json.Marshal(data)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"msg": err,
+	// 	})
+	// 	return
+	// }
+	//fmt.Println(string(jsonData))
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+
+}
+
+func ChangeUserRole(c *gin.Context) {
+	req := struct {
+		User_id  uint
+		Userrole string
+	}{}
+	set := map[string]bool{
+		"Normal": true,
+		"Admin":  true,
+	}
+	if !set[req.Userrole] {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+	query := dbc.DB().Model(&models.User{}).Where("user_id = ?", req.User_id)
+	if err := query.Update("userrole", req.Userrole).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Status(http.StatusOK)
 }
