@@ -12,7 +12,12 @@ import (
 	"gorm.io/gorm"
 )
 
+var c *gorm.DB
+
 func DB() *gorm.DB {
+	if c != nil {
+		return c
+	}
 	file, err := os.Open("DBinfo.json")
 	if err != nil {
 		log.Println("Error opening file:", err)
@@ -35,5 +40,6 @@ func DB() *gorm.DB {
 	if err != nil {
 		log.Println("Error Connecting MySQL:", err)
 	}
+	c = db
 	return db
 }
