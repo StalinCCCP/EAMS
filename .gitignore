@@ -4,5 +4,5 @@
 .DS_Store?
 test/
 __debug*
-
+build/
 DBinfo.json
