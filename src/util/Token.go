@@ -4,14 +4,14 @@ import (
 	"crypto/md5"
 	"fmt"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type UserClaims struct {
 	User_id  uint   `json:"identity"`
 	Username string `json:"name"`
 	Userrole string `json:"is_admin"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 var myKey = []byte("EAMS")
@@ -21,10 +21,10 @@ func GetMd5(s string) string {
 }
 func GenerateToken(user_id uint, username, userrole string) (string, error) {
 	UserClaim := &UserClaims{
-		User_id:        user_id,
-		Username:       username,
-		Userrole:       userrole,
-		StandardClaims: jwt.StandardClaims{},
+		User_id:          user_id,
+		Username:         username,
+		Userrole:         userrole,
+		RegisteredClaims: jwt.RegisteredClaims{},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, UserClaim)
 	tokenString, err := token.SignedString(myKey)
