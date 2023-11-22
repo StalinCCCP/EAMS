@@ -75,7 +75,7 @@ const find = (e)=>{
 const columns=createColumns({click(row){
     const url = router.resolve({
         name:'Hardware Detail',
-        params:{
+        query:{
             HardwareID:row.HardwareID
         }
     })

@@ -17,6 +17,7 @@ func Router() *gin.Engine {
 	r.POST("/login", service.Login)
 	r.POST("/register", service.Register)
 	authUser := r.Group("/user", middlewares.AuthUserCheck())
+	authUser.GET("/isuser", service.IsUser)
 	authUser.POST("/user-detail", service.GetUserDetail)
 	authUser.POST("/user-list", service.GetUserList)
 	authUser.POST("/hlq", service.HardwareListQuery)
@@ -39,6 +40,7 @@ func Router() *gin.Engine {
 	authUser.POST("/lmdq", service.LabMaintenanceDetailQuery)
 	// authUser.GET("/hdsq", service.HardwareStatusQuery)
 	authAdmin := r.Group("/admin", middlewares.AuthAdminCheck())
+	authUser.GET("/isadmin", service.IsAdmin)
 	authAdmin.POST("/hupd", service.HardwareUpdate)
 	authAdmin.DELETE("/hdlt", service.HardwareDelete)
 	authAdmin.PUT("/hc", service.HardwareCreate)
@@ -58,6 +60,7 @@ func Router() *gin.Engine {
 	authAdmin.PUT("/lmc", service.LabMaintenanceCreate)
 	authAdmin.DELETE("/lmdlt", service.LabMaintenanceDelete)
 	authSupervisor := r.Group("/supervisor", middlewares.AuthSupervisorCheck())
+	authUser.GET("/issupervisor", service.IsSupervisor)
 	authSupervisor.POST("/chmod", service.ChangeUserRole)
 	return R
 }

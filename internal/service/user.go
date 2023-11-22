@@ -20,6 +20,15 @@ import (
 // @Param User_id query string true "用户ID"
 // @Success 200 {string} json "{"code":"200","data":""} data中包含了用户ID、用户名、用户密码、用户角色、全名、电子邮箱、电话号码和注册日期"
 // @Router /user-detail [get]
+func IsAdmin(c *gin.Context) {
+	c.Status(http.StatusOK)
+}
+func IsSupervisor(c *gin.Context) {
+	c.Status(http.StatusOK)
+}
+func IsUser(c *gin.Context) {
+	c.Status(http.StatusOK)
+}
 func GetUserDetail(c *gin.Context) {
 	uid := struct {
 		User_id uint
