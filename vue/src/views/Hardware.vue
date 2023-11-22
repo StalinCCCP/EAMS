@@ -1,6 +1,27 @@
 <template>
   <n-space vertical :size="12">
     <n-form class="centerform" ref="formRef" inline :label-width="80" :model="req" :size="size">
+    <n-form-item>
+        <n-select
+            v-model:value="req.Category"
+            placeholder="Select"
+            :options="Category"
+        />
+    </n-form-item>
+    <n-form-item>
+        <n-select
+            v-model:value="req.Status"
+            placeholder="Select"
+            :options="statusOpt"
+        />
+     </n-form-item>
+     <n-form-item>
+        <n-select
+            v-model:value="req.Location"
+            placeholder="Select"
+            :options="Location"
+        />
+     </n-form-item>
       <n-form-item>
         <n-input size="large" v-model:value="req.HardwareName" placeholder="Find..." />
       </n-form-item>
@@ -23,7 +44,7 @@
   </n-space>
 </template>
 <script setup>
-import { h, defineComponent, onMounted } from "vue";
+import { h, defineComponent, onBeforeMount, onMounted } from "vue";
 import {
   NButton,
   useMessage,
@@ -32,6 +53,7 @@ import {
   NForm,
   NFormItem,
   NInput,
+  NSelect
 } from "naive-ui";
 // import {DataTableColumns} from 'naive-ui'
 
@@ -46,10 +68,19 @@ const req=ref({
     Status:'',
     Location:''
 })
+const statusOpt=ref(['保留', '正常', '占用', '非正常'].map(
+        (v) => ({
+          label: v,
+          value: v
+        })
+      ))
+statusOpt.value.push({label:'(Empty)',value:''})
 const data=ref([])
 const formRef = ref(null)
 const size =ref("medium")
 const isadmin=ref(false)
+const Category=ref()
+const Location=ref()
 const postadmin = ()=>{
   http
     .get("/p/admin/isadmin", {
@@ -85,9 +116,63 @@ const post = () => {
     }
 })
 }
+const getCategory = () => {
+  http
+    .get("/p/user/hcq", {
+      validateStatus: function (status) {
+        return true;
+      },
+    })
+    .then((r) => {
+      if (r.status === 200) {
+        
+        Category.value=r.data.data.filter(item=>item!==null).map(
+        (v) => ({
+          label: v,
+          value: v
+        })
+      )
+      Category.value.push({label:'(Empty)',value:''})
+
+        if (Category.value === null) {
+            Category.value = [];
+        }
+
+    }else{
+        createToast("Failed to fetch data: "+r.data.msg)
+    }
+})
+}
+const getLocation = () => {
+  http
+    .get("/p/user/hlocq", {
+      validateStatus: function (status) {
+        return true;
+      },
+    })
+    .then((r) => {
+      if (r.status === 200) {
+        Location.value=r.data.data.filter(item=>item!==null).map(
+        (v) => ({
+          label: v,
+          value: v
+        })
+      )
+        Location.value.push({label:'(Empty)',value:''})
+        // if (Location.value === null) {
+        //     Location.value = [];
+        // }
+
+    }else{
+        createToast("Failed to fetch data: "+r.data.msg)
+    }
+})
+}
 onMounted(()=>{
     post()
     postadmin()
+    getCategory()
+    getLocation()
 })
 const find = (e)=>{
     e.preventDefault()

@@ -157,3 +157,18 @@ const columns=createColumns({click(row){
     window.open(url.href,"_blank")
 }})
 </script>
+
+<!-- <style lang="scss">
+.centerform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.n-input:not(.n-input--autosize) {
+    width: 500px;
+}
+.n-select:not(.n-select--autosize) {
+    width: 500px;
+}
+</style> -->

@@ -2,12 +2,12 @@
 
 <template>
     <n-form>
-      <n-form-item label="Hardware Name">
-      <n-input v-model:value="req.HardwareName" />
+      <n-form-item label="Lab Name">
+      <n-input v-model:value="req.LabName" />
       </n-form-item>
-      <n-form-item label="Category">
+      <!-- <n-form-item label="Category">
       <n-input v-model:value="req.Category" />
-      </n-form-item>
+      </n-form-item> -->
       <n-form-item label="Description">
       <n-input v-model:value="req.Description" />
       </n-form-item>
@@ -39,13 +39,13 @@ import {
 import { createToast } from 'mosha-vue-toastify';
 
 const req=ref({
-    HardwareName:'',
-    Category:'',
+    LabName:'',
+    // Category:'',
     Description:'',
     Status:'',
     Location:''
 })
-const statusOpt=['保留', '正常', '占用', '非正常'].map(
+const statusOpt=[ '正常', '占用', '非正常'].map(
         (v) => ({
           label: v,
           value: v
@@ -53,7 +53,7 @@ const statusOpt=['保留', '正常', '占用', '非正常'].map(
       )
 const put = () => {
   http
-    .put("/p/admin/hc", req.value, {
+    .put("/p/admin/lc", req.value, {
       validateStatus: function (status) {
         return true;
       },

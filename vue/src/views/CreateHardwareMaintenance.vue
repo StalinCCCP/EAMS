@@ -1,21 +1,22 @@
-
-
 <template>
     <n-form>
-      <n-form-item label="Hardware Name">
-      <n-input v-model:value="req.HardwareName" />
+      <n-form-item label="HardwareID">
+      <n-input v-model:value="req.HardwareID" />
       </n-form-item>
-      <n-form-item label="Category">
-      <n-input v-model:value="req.Category" />
+      <n-form-item label="IssueDescription">
+      <n-input v-model:value="req.IssueDescription" />
       </n-form-item>
-      <n-form-item label="Description">
-      <n-input v-model:value="req.Description" />
+      <n-form-item label="SolutionDescription">
+      <n-input v-model:value="req.SolutionDescription" />
       </n-form-item>
       <n-form-item label="Status">
       <n-select v-model:value="req.Status" placeholder="Select" :options="statusOpt"/>
       </n-form-item>
-      <n-form-item label="Location" >
-      <n-input v-model:value="req.Location" />
+      <n-form-item label="MaintenanceDate" >
+      <n-input v-model:value="req.MaintenanceDate" />
+      </n-form-item>
+      <n-form-item label="Cost" >
+      <n-input v-model:value="req.Cost" />
       </n-form-item>
     </n-form>
     <n-form>
@@ -39,11 +40,12 @@ import {
 import { createToast } from 'mosha-vue-toastify';
 
 const req=ref({
-    HardwareName:'',
-    Category:'',
-    Description:'',
-    Status:'',
-    Location:''
+    HardwareID:'',
+    IssueDescription:'',
+    SolutionDescription:'',
+    MaintenanceDate:'',
+    Cost:0,
+    Status:''
 })
 const statusOpt=['保留', '正常', '占用', '非正常'].map(
         (v) => ({
@@ -53,7 +55,7 @@ const statusOpt=['保留', '正常', '占用', '非正常'].map(
       )
 const put = () => {
   http
-    .put("/p/admin/hc", req.value, {
+    .put("/p/admin/hmc", req.value, {
       validateStatus: function (status) {
         return true;
       },

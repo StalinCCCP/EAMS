@@ -63,6 +63,7 @@ func AuthAdminCheck() gin.HandlerFunc {
 			})
 			return
 		}
+		c.Set("Username", UserName[0])
 		c.Next()
 	}
 }

@@ -2,13 +2,13 @@ import { h } from "vue";
 import { NButton } from "naive-ui";
 export default function createColumns({click}) {
     return [
-{
+      {
         title: 'Maintenance Process ID',
         key: 'MaintenanceProcessID'
       },
       {
-        title: 'Hardware ID',
-        key: 'HardwareID'
+        title: 'Lab ID',
+        key: 'LabID'
       },
       {
         title: 'Issue Description',

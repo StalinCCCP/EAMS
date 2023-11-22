@@ -60,6 +60,27 @@ const routes = [
     component: function (){
       return import(/* webpackChunkName: "about" */ '../views/CreateHardware.vue')
     }
+  },
+  {
+    path: '/hardware-maintenance-detail',
+    name: 'Hardware Maintenance Detail',
+    component: function (){
+      return import(/* webpackChunkName: "about" */ '../views/HardwareMaintenanceDetail.vue')
+    }
+  },
+  {
+    path: '/hardware-maintenance',
+    name: 'Hardware Maintenance',
+    component: function (){
+      return import(/* webpackChunkName: "about" */ '../views/HardwareMaintenance.vue')
+    }
+  },
+  {
+    path: '/createhardwaremaintenance',
+    name: 'Create Hardware Maintenance',
+    component: function (){
+      return import(/* webpackChunkName: "about" */ '../views/CreateHardwareMaintenance.vue')
+    }
   }
   
 ]

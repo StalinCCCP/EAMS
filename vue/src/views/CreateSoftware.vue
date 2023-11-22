@@ -2,11 +2,11 @@
 
 <template>
     <n-form>
-      <n-form-item label="Hardware Name">
-      <n-input v-model:value="req.HardwareName" />
+      <n-form-item label="Software Name">
+      <n-input v-model:value="req.SoftwareName" />
       </n-form-item>
-      <n-form-item label="Category">
-      <n-input v-model:value="req.Category" />
+      <n-form-item label="Version">
+      <n-input v-model:value="req.Version" />
       </n-form-item>
       <n-form-item label="Description">
       <n-input v-model:value="req.Description" />
@@ -39,8 +39,8 @@ import {
 import { createToast } from 'mosha-vue-toastify';
 
 const req=ref({
-    HardwareName:'',
-    Category:'',
+    SoftwareName:'',
+    Version:'',
     Description:'',
     Status:'',
     Location:''
@@ -53,7 +53,7 @@ const statusOpt=['保留', '正常', '占用', '非正常'].map(
       )
 const put = () => {
   http
-    .put("/p/admin/hc", req.value, {
+    .put("/p/admin/sc", req.value, {
       validateStatus: function (status) {
         return true;
       },

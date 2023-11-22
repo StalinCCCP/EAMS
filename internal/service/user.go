@@ -29,6 +29,16 @@ func IsSupervisor(c *gin.Context) {
 func IsUser(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
+func WhoAmI(c *gin.Context) {
+	tr, ok := c.Get("Username")
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+	}
+	data := tr.(string)
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
 func GetUserDetail(c *gin.Context) {
 	uid := struct {
 		User_id uint
