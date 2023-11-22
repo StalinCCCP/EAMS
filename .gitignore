@@ -6,3 +6,4 @@ test/
 __debug*
 build/
 DBinfo.json
+node_modules/

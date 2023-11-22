@@ -42,6 +42,13 @@ func AuthAdminCheck() gin.HandlerFunc {
 			c.Status(http.StatusInternalServerError)
 			return
 		}
+		if len(UserName) == 0 || len(UserRole) == 0 || len(User_id) == 0 {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
+			return
+		}
 		if UserName[0] != userClaim.Username || UserRole[0] != userClaim.Userrole {
 			c.Abort()
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -91,6 +98,13 @@ func AuthSupervisorCheck() gin.HandlerFunc {
 		if err = query.Pluck("userrole", &UserRole).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if len(UserName) == 0 || len(UserRole) == 0 || len(User_id) == 0 {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
 			return
 		}
 		if UserName[0] != userClaim.Username || UserRole[0] != userClaim.Userrole {
@@ -143,6 +157,13 @@ func AuthUserCheck() gin.HandlerFunc {
 		if err = query.Pluck("userrole", &UserRole).Error; err != nil {
 			c.Abort()
 			c.Status(http.StatusInternalServerError)
+			return
+		}
+		if len(UserName) == 0 || len(UserRole) == 0 || len(User_id) == 0 {
+			c.Abort()
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Unauthorized",
+			})
 			return
 		}
 		if UserName[0] != userClaim.Username || UserRole[0] != userClaim.Userrole {
