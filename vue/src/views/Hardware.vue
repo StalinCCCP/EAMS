@@ -100,6 +100,7 @@ const columns=createColumns({click(row){
             HardwareID:row.HardwareID
         }
     })
+    window.open(url.href,"_blank")
 },del(row){
     http
     .delete("/p/admin/hdlt", {data:{HardwareID:row.HardwareID}}, {
