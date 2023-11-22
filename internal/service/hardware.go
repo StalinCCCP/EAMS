@@ -108,12 +108,12 @@ func HardwareDetailQuery(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	var data1 []models.Hardware
+	var data1 models.Hardware
 	query := dbc.DB().Model(&models.Hardware{}).Where("hardware_id = ?", req.HardwareID)
-	err := query.Find(&data1).Error
+	err := query.First(&data1).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err,
+		c.JSON(http.StatusFailedDependency, gin.H{
+			"msg": "Requested ID not found",
 		})
 		return
 	}

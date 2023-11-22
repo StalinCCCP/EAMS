@@ -108,9 +108,9 @@ func SoftwareDetailQuery(c *gin.Context) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
-	var data1 []models.Software
+	var data1 models.Software
 	query := dbc.DB().Model(&models.Software{}).Where("Software_id = ?", req.SoftwareID)
-	err := query.Find(&data1).Error
+	err := query.First(&data1).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": err,

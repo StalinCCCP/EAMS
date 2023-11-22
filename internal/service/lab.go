@@ -117,9 +117,9 @@ func LabDetailQuery(c *gin.Context) {
 		})
 		return
 	}
-	var data2 []models.LabMaintenance
+	var data2 models.LabMaintenance
 	query = dbc.DB().Model(&models.LabMaintenance{}).Where("Lab_id = ?", req.LabID)
-	err = query.Find(&data2).Error
+	err = query.First(&data2).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": err,

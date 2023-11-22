@@ -46,8 +46,20 @@ const req=ref({
 const data=ref([])
 const formRef = ref(null)
 const size =ref("medium")
-
-
+const isadmin=ref(false)
+const postadmin = ()=>{
+  http
+    .get("/p/admin/isadmin", {
+      validateStatus: function (status) {
+        return true;
+      },
+    })
+    .then((r) => {
+      if (r.status === 200) {
+        isadmin.value=true
+      }
+})
+}
 const post = () => {
   http
     .post("/p/user/hlq", req.value, {

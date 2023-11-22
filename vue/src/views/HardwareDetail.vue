@@ -102,28 +102,29 @@ const postq = () => {
     .then((r) => {
       if (r.status === 200) {
         data.value = r.data.data;
-        HardwareName.value=data.value.Hinfo[0].HardwareName
-        Category.value=data.value.Hinfo[0].Category
-        Description.value=data.value.Hinfo[0].Description
-        Status.value=data.value.Hinfo[0].Status
-        Location.value=data.value.Hinfo[0].Location
+        HardwareName.value=data.value.Hinfo.HardwareName
+        Category.value=data.value.Hinfo.Category
+        Description.value=data.value.Hinfo.Description
+        Status.value=data.value.Hinfo.Status
+        Location.value=data.value.Hinfo.Location
         if (data.value === null) {
           data.value = [];
         }
 
     }else{
+        data.value={}
         createToast("Failed to fetch data: "+r.data.msg)
     }
 })
 }
 const post= () => {
-  data.value.Hinfo[0].HardwareName=HardwareName.value
-  data.value.Hinfo[0].Category=Category.value
-  data.value.Hinfo[0].Description=Description.value
-  data.value.Hinfo[0].Status=Status.value
-  data.value.Hinfo[0].Location=Location.value
+  data.value.Hinfo.HardwareName=HardwareName.value
+  data.value.Hinfo.Category=Category.value
+  data.value.Hinfo.Description=Description.value
+  data.value.Hinfo.Status=Status.value
+  data.value.Hinfo.Location=Location.value
   http
-    .post("/p/admin/hupd", data.value.Hinfo[0], {
+    .post("/p/admin/hupd", data.value.Hinfo, {
       validateStatus: function (status) {
         return true;
       },
