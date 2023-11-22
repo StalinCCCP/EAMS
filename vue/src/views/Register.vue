@@ -20,6 +20,7 @@ const register = () => {
       if (r.status===200) {
         createToast("Registered successfully")
         localStorage.setItem("Authorization", r.data.data.token)
+        router.back()
       }
       else
         createToast("Register failed:"+r.data.msg)
