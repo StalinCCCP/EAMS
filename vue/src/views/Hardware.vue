@@ -31,19 +31,22 @@ import {
   NInput,
 } from "naive-ui";
 // import {DataTableColumns} from 'naive-ui'
-import http from "@/util/http";
-import { createToast } from "mosha-vue-toastify";
-import createColumns from "@/models/HardwareTable";
-import { ref } from "vue";
-const req = ref({
-  HardwareName: "",
-  Category: "",
-  Status: "",
-  Location: "",
-});
-const data = ref([]);
-const formRef = ref(null);
-const size = ref("medium");
+
+import http from '@/util/http';
+import { createToast } from 'mosha-vue-toastify';
+import createColumns from '@/models/HardwareTable'
+import {ref} from 'vue'
+import router from '@/router/index'
+const req=ref({
+    HardwareName:'',
+    Category:'',
+    Status:'',
+    Location:''
+})
+const data=ref([])
+const formRef = ref(null)
+const size =ref("medium")
+
 
 const post = () => {
   http
@@ -58,20 +61,30 @@ const post = () => {
         if (data.value === null) {
           data.value = [];
         }
-      } else {
-        createToast("Failed to fetch data: " + r.data.msg);
-      }
-    });
-};
-onMounted(post);
-const find = (e) => {
-  e.preventDefault();
-  post();
-};
-const columns = createColumns();
-const pagination = {
-  pagiSize: 20,
-};
+
+    }else{
+        createToast("Failed to fetch data: "+r.data.msg)
+    }
+})
+}
+onMounted(post)
+const find = (e)=>{
+    e.preventDefault()
+    post()
+}
+const columns=createColumns({click(row){
+    const url = router.resolve({
+        name:'Hardware Detail',
+        params:{
+            HardwareID:row.HardwareID
+        }
+    })
+    window.open(url.href,"_blank")
+}})
+const pagination={
+    pagiSize:20,
+}
+
 // defineComponent({
 //         setup(){
 //             const message = useMessage()
