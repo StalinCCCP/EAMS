@@ -1,4 +1,6 @@
-export default function createColumns() {
+import { h } from "vue";
+import { NButton } from "naive-ui";
+export default function createColumns({click}) {
     return [
       {
         title: 'HardwareID',
@@ -19,6 +21,22 @@ export default function createColumns() {
       {
         title: 'Location',
         key: 'Location'
+      },
+      {
+        title: 'Action',
+        key: 'actions',
+        render (row) {
+          return h(
+            NButton,
+            {
+              strong: true,
+              tertiary: true,
+              size: 'small',
+              onClick: () => click(row)
+            },
+            { default: () => 'Detail' }
+          )
+        }
       }
     ]
   }

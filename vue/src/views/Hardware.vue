@@ -35,6 +35,7 @@ import http from '@/util/http';
 import { createToast } from 'mosha-vue-toastify';
 import createColumns from '@/models/HardwareTable'
 import {ref} from 'vue'
+import router from '@/router/index'
 const req=ref({
     HardwareName:'',
     Category:'',
@@ -64,7 +65,15 @@ const find = (e)=>{
     e.preventDefault()
     post()
 }
-const columns=createColumns()
+const columns=createColumns({click(row){
+    const url = router.resolve({
+        name:'Hardware Detail',
+        params:{
+            HardwareID:row.HardwareID
+        }
+    })
+    window.open(url.href,"_blank")
+}})
 const pagination={
     pagiSize:20,
 }

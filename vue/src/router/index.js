@@ -46,6 +46,13 @@ const routes = [
     component: function (){
       return import(/* webpackChunkName: "about" */ '../views/Hardware.vue')
     }
+  },
+  {
+    path: '/hardware-detail',
+    name: 'Hardware Detail',
+    component: function (){
+      return import(/* webpackChunkName: "about" */ '../views/HardwareDetail.vue')
+    }
   }
   
 ]
