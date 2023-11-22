@@ -1,6 +1,14 @@
 <template>
-<router-view></router-view>
+  <div class="wrapper">
+    <NarBar />
+
+      <router-view></router-view>
+
+  </div>
 </template>
+<script setup>
+import NarBar from "./views/NarBar.vue";
+</script>
 
 <style lang="scss">
 #app {
