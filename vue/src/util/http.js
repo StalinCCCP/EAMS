@@ -21,9 +21,14 @@ http.interceptors.response.use(response => {
 })
 
 http.interceptors.response.use(response => {
-    if (response.data.msg === "Not initialized") {
-        router.push('/init').then(r => r)
+    if(!response.data){
+        return response
     }
-    return response
+    else{
+        if (response.data.msg === "Not initialized") {
+            router.push('/init').then(r => r)
+        }
+        return response
+    } 
 }, error => Promise.reject(error))
 export default http

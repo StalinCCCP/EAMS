@@ -7,6 +7,9 @@
       <n-form-item>
         <n-button attr-type="button" @click="find"> Go! </n-button>
       </n-form-item>
+      <n-form-item>
+        <n-button :disabled="!isadmin" attr-type="button" @click="create"> + </n-button>
+      </n-form-item>
     </n-form>
   </n-space>
   <n-space vertical :size="12">
@@ -60,6 +63,9 @@ const postadmin = ()=>{
       }
 })
 }
+const create = ()=>{
+    router.push('/createhardware')
+}
 const post = () => {
   http
     .post("/p/user/hlq", req.value, {
@@ -79,7 +85,10 @@ const post = () => {
     }
 })
 }
-onMounted(post)
+onMounted(()=>{
+    post()
+    postadmin()
+})
 const find = (e)=>{
     e.preventDefault()
     post()
@@ -91,8 +100,23 @@ const columns=createColumns({click(row){
             HardwareID:row.HardwareID
         }
     })
-    window.open(url.href,"_blank")
+},del(row){
+    http
+    .delete("/p/admin/hdlt", {data:{HardwareID:row.HardwareID}}, {
+      validateStatus: function (status) {
+        return true;
+      },
+    })
+    .then((r) => {
+      if (r.status === 200) {
+        createToast("Delete Successfully ")
+    }else{
+        createToast("Failed to delete")
+    }
+})
 }})
+    //window.open(url.href,"_blank")
+
 const pagination={
     pagiSize:20,
 }
