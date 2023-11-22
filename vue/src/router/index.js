@@ -53,6 +53,13 @@ const routes = [
     component: function (){
       return import(/* webpackChunkName: "about" */ '../views/HardwareDetail.vue')
     }
+  },
+  {
+    path: '/createhardware',
+    name: 'CreateHardware',
+    component: function (){
+      return import(/* webpackChunkName: "about" */ '../views/CreateHardware.vue')
+    }
   }
   
 ]
